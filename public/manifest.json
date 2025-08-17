@@ -1,0 +1,50 @@
+{
+    "manifest_version": 3,
+    "name": "ddom - Solana Token Analytics",
+    "version": "1.0.0",
+    "description": "Analyze Solana token distribution and holder concentration",
+    "permissions": [
+        "storage",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://*.solana.com/*",
+        "https://*.helius-rpc.com/*",
+        "https://*.quicknode.pro/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "ddom - Token Analytics"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://*.raydium.io/*",
+                "https://*.jup.ag/*",
+                "https://*.dexscreener.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "popup.html",
+                "_next/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }
+}
