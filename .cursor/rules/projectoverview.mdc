@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+description: Project Description:
+
+This project is a Solana memecoin analytics tool that allows users to analyze the distribution of any SPL token by holders. By pasting a token mint address (e.g., 3L8MNSHc3V7ssEdQiHRbGrJfMPaSJMKykhBHKgikpump), the application fetches the token’s total supply and retrieves the largest token accounts on-chain. It then maps each token account back to its wallet owner, aggregates balances across multiple accounts per owner, and calculates the percentage of the total supply each holder controls.
+
+The output is a ranked list of holders (whales, liquidity pools, exchanges, and individual wallets) sorted by percentage ownership, providing clear insights into token concentration and decentralization.
+
+This tool will be built as a Chrome extension, allowing users to analyze token distributions directly while browsing DEXs, token explorers, or social media platforms without leaving their current tab.
+---
