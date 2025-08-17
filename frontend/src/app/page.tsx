@@ -3,39 +3,39 @@ import { BarChart3, Chrome, Github } from 'lucide-react'
 
 export default function HomePage() {
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-surface-background">
             <div className="max-w-4xl mx-auto py-12 px-4">
                 {/* Header */}
                 <div className="text-center mb-12">
                     <div className="flex items-center justify-center gap-3 mb-4">
-                        <BarChart3 className="w-10 h-10 text-brand-600" />
-                        <h1 className="text-4xl font-bold text-gray-900">ddom</h1>
+                        <BarChart3 className="w-10 h-10 text-brand-500" />
+                        <h1 className="text-4xl font-bold text-text-dark">ddom</h1>
                     </div>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-xl text-text-medium max-w-2xl mx-auto">
                         Solana memecoin analytics tool for analyzing token distribution and holder concentration
                     </p>
                 </div>
 
                 {/* Features */}
                 <div className="grid md:grid-cols-3 gap-6 mb-12">
-                    <div className="card p-6">
-                        <BarChart3 className="w-8 h-8 text-brand-600 mb-3" />
-                        <h3 className="font-semibold text-gray-900 mb-2">Token Analysis</h3>
-                        <p className="text-gray-600 text-sm">
+                    <div className="card p-6 hover:shadow-anthropic-lg transition-all duration-200">
+                        <BarChart3 className="w-8 h-8 text-brand-500 mb-3" />
+                        <h3 className="font-semibold text-text-dark mb-2">Token Analysis</h3>
+                        <p className="text-text-medium text-sm">
                             Analyze any SPL token's distribution by pasting its mint address
                         </p>
                     </div>
-                    <div className="card p-6">
-                        <Chrome className="w-8 h-8 text-brand-600 mb-3" />
-                        <h3 className="font-semibold text-gray-900 mb-2">Browser Extension</h3>
-                        <p className="text-gray-600 text-sm">
+                    <div className="card p-6 hover:shadow-anthropic-lg transition-all duration-200">
+                        <Chrome className="w-8 h-8 text-brand-500 mb-3" />
+                        <h3 className="font-semibold text-text-dark mb-2">Browser Extension</h3>
+                        <p className="text-text-medium text-sm">
                             Seamlessly analyze tokens while browsing DEXs and social media
                         </p>
                     </div>
-                    <div className="card p-6">
-                        <Github className="w-8 h-8 text-brand-600 mb-3" />
-                        <h3 className="font-semibold text-gray-900 mb-2">Open Source</h3>
-                        <p className="text-gray-600 text-sm">
+                    <div className="card p-6 hover:shadow-anthropic-lg transition-all duration-200">
+                        <Github className="w-8 h-8 text-brand-500 mb-3" />
+                        <h3 className="font-semibold text-text-dark mb-2">Open Source</h3>
+                        <p className="text-text-medium text-sm">
                             Transparent analytics with open source blockchain data processing
                         </p>
                     </div>
@@ -46,7 +46,7 @@ export default function HomePage() {
                     <div className="flex justify-center gap-4">
                         <Link
                             href="/popup"
-                            className="btn-primary inline-flex items-center gap-2"
+                            className="btn-primary inline-flex items-center gap-2 hover:shadow-anthropic transition-all duration-200"
                         >
                             <BarChart3 className="w-4 h-4" />
                             Try Extension Popup
@@ -55,7 +55,7 @@ export default function HomePage() {
                             View Documentation
                         </button>
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-text-subtle">
                         This is the development preview. Install as Chrome extension for full functionality.
                     </p>
                 </div>

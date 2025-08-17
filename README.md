@@ -1,32 +1,6 @@
-# ddom - Solana Token Analytics
+# dont dump on me - Solana Token Analytics
 
 A Chrome extension and web application for analyzing Solana memecoin distribution and holder concentration.
-
-## Architecture
-
-This project uses a full-stack architecture:
-
-- **Frontend**: Next.js 14 + TypeScript + Tailwind CSS
-- **Backend**: Python FastAPI + Solana Web3 integration
-- **Chrome Extension**: Popup interface with real-time token analysis
-
-## Project Structure
-
-```
-ddom/
-├── frontend/          # Next.js React application
-│   ├── src/
-│   │   ├── app/       # Next.js App Router pages
-│   │   ├── components/# Reusable React components
-│   │   └── lib/       # Frontend utilities
-│   └── public/        # Static assets & Chrome extension manifest
-├── backend/           # Python FastAPI server
-│   ├── main.py        # FastAPI application entry point
-│   ├── models/        # Pydantic data models
-│   ├── services/      # Business logic (Solana integration)
-│   └── requirements.txt
-└── README.md
-```
 
 ## Development Setup
 
@@ -95,13 +69,6 @@ ddom/
 2. Open Chrome Extensions page: `chrome://extensions/`
 3. Enable "Developer mode"
 4. Click "Load unpacked" and select the `frontend/dist` folder
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
 
 ## License
 

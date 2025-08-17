@@ -7,3 +7,5 @@ solana==0.32.0
 python-multipart==0.0.6
 python-json-logger==2.0.7
 python-dotenv==1.0.0
+websockets==11.0.3
+asyncio-mqtt==0.16.1

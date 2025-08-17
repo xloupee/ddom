@@ -7,7 +7,9 @@ import os
 from dotenv import load_dotenv
 
 from services.solana_service import SolanaService
+from services.pumpportal_service import PumpPortalService
 from models.token_analysis import TokenAnalysisResponse
+from models.pumpportal_models import RealTimeStats, TrendingToken
 
 load_dotenv()
 
@@ -26,8 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Solana service
+# Initialize services
 solana_service = SolanaService()
+pumpportal_service = PumpPortalService()
 
 class TokenAnalysisRequest(BaseModel):
     mint_address: str
@@ -66,8 +69,57 @@ async def get_quick_stats(mint_address: str):
     Get quick statistics for a token (for popup preview)
     """
     try:
-        stats = await solana_service.get_quick_token_stats(mint_address)
-        return stats
+        # Try PumpPortal first for real-time data
+        pumpportal_stats = await pumpportal_service.get_token_holders_analysis(mint_address)
+        
+        if pumpportal_stats["total_holders"] > 0:
+            # Use PumpPortal data if available
+            return {
+                "total_holders": pumpportal_stats["total_holders"],
+                "top_10_percentage": pumpportal_stats["top_10_percentage"],
+                "whale_count": pumpportal_stats["whale_count"],
+                "last_updated": pumpportal_stats["analysis_timestamp"]
+            }
+        else:
+            # Fallback to Solana RPC data
+            stats = await solana_service.get_quick_token_stats(mint_address)
+            return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/trending-tokens")
+async def get_trending_tokens(limit: int = 10):
+    """
+    Get trending tokens from PumpPortal
+    """
+    try:
+        trending = await pumpportal_service.get_trending_tokens(limit)
+        return {"trending_tokens": trending}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/token/{mint_address}/realtime-stats")
+async def get_realtime_stats(mint_address: str):
+    """
+    Get comprehensive real-time statistics for a token
+    """
+    try:
+        # Get PumpPortal analysis
+        holder_stats = await pumpportal_service.get_token_holders_analysis(mint_address)
+        
+        # Get recent trades for price info
+        trades = await pumpportal_service.get_token_trades(mint_address, limit=10)
+        
+        current_price = trades[0].price / trades[0].amount if trades else 0
+        
+        return RealTimeStats(
+            token_address=mint_address,
+            current_price=current_price,
+            market_cap=trades[0].market_cap if trades else 0,
+            volume_24h=holder_stats["total_volume_sol"],
+            holder_stats=holder_stats,
+            last_updated=holder_stats["analysis_timestamp"]
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
