@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Search, BarChart3, Users, TrendingUp, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Search, BarChart3, Users, TrendingUp, AlertCircle, Sun, Moon } from 'lucide-react'
 import { apiClient, QuickStatsResponse } from '@/lib/api'
 
 export default function Popup() {
@@ -9,6 +9,25 @@ export default function Popup() {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [quickStats, setQuickStats] = useState<QuickStatsResponse | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [isDarkMode, setIsDarkMode] = useState(false)
+
+    // Dark mode toggle logic
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme')
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const shouldUseDark = savedTheme === 'dark' || (!savedTheme && prefersDark)
+
+        setIsDarkMode(shouldUseDark)
+        document.documentElement.setAttribute('data-theme', shouldUseDark ? 'dark' : 'light')
+    }, [])
+
+    const toggleDarkMode = () => {
+        const newTheme = !isDarkMode
+        setIsDarkMode(newTheme)
+        const theme = newTheme ? 'dark' : 'light'
+        localStorage.setItem('theme', theme)
+        document.documentElement.setAttribute('data-theme', theme)
+    }
 
     const handleAnalyze = async () => {
         if (!tokenAddress.trim()) return
@@ -31,9 +50,22 @@ export default function Popup() {
         <div className="w-96 h-[500px] bg-surface-background flex flex-col">
             {/* Header */}
             <div className="bg-surface-primary border-b border-border-primary p-4">
-                <div className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-brand-500" />
-                    <h1 className="font-semibold text-text-dark">ddom</h1>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-brand-500" />
+                        <h1 className="font-semibold text-text-dark">ddom</h1>
+                    </div>
+                    <button
+                        onClick={toggleDarkMode}
+                        className="p-2 rounded-lg hover:bg-surface-secondary transition-colors text-text-medium hover:text-text-dark"
+                        title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                    >
+                        {isDarkMode ? (
+                            <Sun className="w-4 h-4" />
+                        ) : (
+                            <Moon className="w-4 h-4" />
+                        )}
+                    </button>
                 </div>
                 <p className="text-sm text-text-medium mt-1">Solana Token Analytics</p>
             </div>
@@ -88,7 +120,7 @@ export default function Popup() {
                     <div className="space-y-4">
                         {/* Token Info Header */}
                         {(quickStats.token_name || quickStats.token_symbol) && (
-                            <div className="card p-4 bg-gradient-to-r from-brand-50 to-brand-100 border-brand-200">
+                            <div className="card p-4 bg-gradient-to-r from-anthropic-beige-whisper to-anthropic-beige-ultra-light border-brand-200">
                                 <div className="flex items-center gap-2">
                                     <div className="w-8 h-8 bg-brand-500 rounded-full flex items-center justify-center">
                                         <span className="text-white text-sm font-bold">
@@ -123,10 +155,10 @@ export default function Popup() {
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm text-text-medium">Top 10 Control</span>
                                     <span className={`text-sm font-semibold px-2 py-1 rounded ${quickStats.top_10_percentage > 80
-                                            ? 'text-red-700 bg-red-100'
-                                            : quickStats.top_10_percentage > 50
-                                                ? 'text-yellow-700 bg-yellow-100'
-                                                : 'text-green-700 bg-green-100'
+                                        ? 'text-red-700 bg-red-100'
+                                        : quickStats.top_10_percentage > 50
+                                            ? 'text-yellow-700 bg-yellow-100'
+                                            : 'text-green-700 bg-green-100'
                                         }`}>
                                         {quickStats.top_10_percentage.toFixed(1)}%
                                     </span>
@@ -143,10 +175,10 @@ export default function Popup() {
                             <div className="mt-4 pt-3 border-t border-border-primary">
                                 <div className="flex items-center gap-2">
                                     <div className={`w-2 h-2 rounded-full ${quickStats.top_10_percentage > 80
-                                            ? 'bg-red-500'
-                                            : quickStats.top_10_percentage > 50
-                                                ? 'bg-yellow-500'
-                                                : 'bg-green-500'
+                                        ? 'bg-red-500'
+                                        : quickStats.top_10_percentage > 50
+                                            ? 'bg-yellow-500'
+                                            : 'bg-green-500'
                                         }`} />
                                     <span className="text-xs text-text-subtle">
                                         {quickStats.top_10_percentage > 80
@@ -196,10 +228,10 @@ export default function Popup() {
                             <p className="text-xs text-text-medium">Risk Level</p>
                             <div className="flex items-center gap-1">
                                 <div className={`w-2 h-2 rounded-full ${quickStats.top_10_percentage > 80
-                                        ? 'bg-red-500'
-                                        : quickStats.top_10_percentage > 50
-                                            ? 'bg-yellow-500'
-                                            : 'bg-green-500'
+                                    ? 'bg-red-500'
+                                    : quickStats.top_10_percentage > 50
+                                        ? 'bg-yellow-500'
+                                        : 'bg-green-500'
                                     }`} />
                                 <span className="text-xs font-medium text-text-dark">
                                     {quickStats.top_10_percentage > 80

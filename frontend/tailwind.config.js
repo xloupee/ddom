@@ -9,7 +9,28 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                // Anthropic Color Palette
+                // Dynamic colors using CSS variables
+                text: {
+                    dark: 'var(--text-dark)',
+                    medium: 'var(--text-medium)',
+                    light: 'var(--text-light)',
+                    subtle: 'var(--text-subtle)',
+                },
+                surface: {
+                    primary: 'var(--surface-primary)',
+                    secondary: 'var(--surface-secondary)',
+                    background: 'var(--background-primary)',
+                    'background-secondary': 'var(--background-secondary)',
+                },
+                border: {
+                    primary: 'var(--border-color)',
+                    secondary: 'var(--beige-medium)',
+                },
+                accent: {
+                    primary: 'var(--accent-primary)',
+                    hover: 'var(--accent-hover)',
+                },
+                // Static Anthropic colors for gradients/fixed colors
                 anthropic: {
                     orange: '#d4a37f',
                     'orange-light': '#d8ac8c',
@@ -22,45 +43,15 @@ module.exports = {
                     'beige-ultra-light': '#f6ede5',
                     'beige-whisper': '#fbf6f2',
                 },
-                text: {
-                    dark: '#2c1810',
-                    medium: '#5d4037',
-                    light: '#8d6e63',
-                    subtle: '#a1887f',
-                },
-                surface: {
-                    primary: '#ffffff',
-                    secondary: '#eedacc',
-                    background: '#fbf6f2',
-                    'background-secondary': '#f6ede5',
-                },
-                border: {
-                    primary: '#e5c8b2',
-                    secondary: '#ead1bf',
-                },
-                // Keep some grays for compatibility
-                gray: {
-                    50: '#fbf6f2',
-                    100: '#f6ede5',
-                    200: '#eedacc',
-                    300: '#e5c8b2',
-                    400: '#a1887f',
-                    500: '#8d6e63',
-                    600: '#5d4037',
-                    700: '#2c1810',
-                    800: '#1f1310',
-                    900: '#161008',
-                    950: '#0d0804',
-                },
-                // Update brand colors to use Anthropic orange
+                // Brand colors using CSS variables
                 brand: {
-                    50: '#fbf6f2',
-                    100: '#f6ede5',
-                    200: '#eedacc',
+                    50: 'var(--beige-whisper)',
+                    100: 'var(--beige-ultra-light)',
+                    200: 'var(--surface-secondary)',
                     300: '#e1bfa5',
                     400: '#d8ac8c',
-                    500: '#d4a37f',
-                    600: '#c89968',
+                    500: 'var(--accent-primary)',
+                    600: 'var(--accent-hover)',
                     700: '#b58a56',
                     800: '#9a7449',
                     900: '#7d5e3b',

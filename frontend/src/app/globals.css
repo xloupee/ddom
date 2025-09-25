@@ -17,13 +17,12 @@
     --beige-ultra-light: #f6ede5;
     --beige-whisper: #fbf6f2;
 
-    /* Text Colors */
+    /* Light Mode Colors */
     --text-dark: #2c1810;
     --text-medium: #5d4037;
     --text-light: #8d6e63;
     --text-subtle: #a1887f;
 
-    /* Semantic Colors */
     --background-primary: #fbf6f2;
     --background-secondary: #f6ede5;
     --surface-primary: #ffffff;
@@ -31,6 +30,26 @@
     --border-color: #e5c8b2;
     --accent-primary: #d4a37f;
     --accent-hover: #c89968;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Colors */
+    --text-dark: #f5f1eb;
+    --text-medium: #d4c5b5;
+    --text-light: #b39c8a;
+    --text-subtle: #9b8775;
+
+    --background-primary: #0d0a07;
+    --background-secondary: #1a140f;
+    --surface-primary: #1f1812;
+    --surface-secondary: #2a2017;
+    --border-color: #3d2f24;
+    --accent-primary: #d4a37f;
+    --accent-hover: #e2b389;
+
+    /* Dark specific overrides */
+    --beige-ultra-light: #2a2017;
+    --beige-whisper: #1f1812;
 }
 
 @layer base {
