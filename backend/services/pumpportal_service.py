@@ -51,11 +51,12 @@ class PumpPortalService:
             async with websockets.connect(self.websocket_url) as websocket:
                 logger.info("Connected to PumpPortal WebSocket")
                 
-                # Subscribe to all events
+                # Subscribe to new token creation events
                 subscribe_message = {
                     "method": "subscribeNewToken"
                 }
                 await websocket.send(json.dumps(subscribe_message))
+                logger.info("Subscribed to new token events")
                 
                 async for message in websocket:
                     try:
@@ -67,6 +68,34 @@ class PumpPortalService:
                         
         except Exception as e:
             logger.error(f"WebSocket connection error: {e}")
+            raise
+    
+    async def subscribe_to_token_trades(self, mint_address: str) -> AsyncGenerator[Dict, None]:
+        """
+        Subscribe to real-time trades for a specific token
+        """
+        try:
+            async with websockets.connect(self.websocket_url) as websocket:
+                logger.info(f"Connected to PumpPortal WebSocket for token {mint_address}")
+                
+                # Subscribe to trades for specific token
+                subscribe_message = {
+                    "method": "subscribeTokenTrade",
+                    "keys": [mint_address]
+                }
+                await websocket.send(json.dumps(subscribe_message))
+                logger.info(f"Subscribed to trades for token {mint_address}")
+                
+                async for message in websocket:
+                    try:
+                        data = json.loads(message)
+                        yield data
+                    except json.JSONDecodeError:
+                        logger.error(f"Failed to parse WebSocket message: {message}")
+                        continue
+                        
+        except Exception as e:
+            logger.error(f"WebSocket connection error for token {mint_address}: {e}")
             raise
     
     async def get_token_trades(self, mint_address: str, limit: int = 100) -> List[TradeEvent]:
@@ -108,54 +137,110 @@ class PumpPortalService:
     
     async def get_token_holders_analysis(self, mint_address: str) -> Dict:
         """
-        Analyze token holders using PumpPortal trade data
+        Analyze token holders using PumpPortal real-time trade data
         """
         try:
-            trades = await self.get_token_trades(mint_address, limit=1000)
+            # Get historical trades first
+            trades = await self.get_token_trades(mint_address, limit=2000)  # Increased limit for better accuracy
+            
+            if not trades:
+                logger.warning(f"No trades found for token {mint_address}")
+                return {
+                    "total_holders": 0,
+                    "top_10_percentage": 0.0,
+                    "whale_count": 0,
+                    "total_volume_sol": 0.0,
+                    "largest_holder_percentage": 0.0,
+                    "analysis_timestamp": datetime.utcnow()
+                }
             
             # Analyze holder distribution from trades
             holder_balances = {}
-            total_volume = 0
+            total_volume_sol = 0
+            total_volume_tokens = 0
+            unique_traders = set()
             
+            # Process all trades to build holder balances
             for trade in trades:
                 trader = trade.trader
-                amount = trade.amount
+                token_amount = trade.amount
+                sol_amount = trade.price
+                
+                unique_traders.add(trader)
                 
                 if trader not in holder_balances:
-                    holder_balances[trader] = 0
+                    holder_balances[trader] = {
+                        'tokens': 0,
+                        'trades': 0,
+                        'last_trade': trade.timestamp
+                    }
                 
+                # Update balances based on buy/sell
                 if trade.is_buy:
-                    holder_balances[trader] += amount
+                    holder_balances[trader]['tokens'] += token_amount
                 else:
-                    holder_balances[trader] -= amount
+                    holder_balances[trader]['tokens'] -= token_amount
                 
-                total_volume += trade.price
+                holder_balances[trader]['trades'] += 1
+                holder_balances[trader]['last_trade'] = max(
+                    holder_balances[trader]['last_trade'], 
+                    trade.timestamp
+                )
+                
+                total_volume_sol += sol_amount
+                total_volume_tokens += token_amount
             
-            # Filter out holders with zero or negative balances
-            active_holders = {k: v for k, v in holder_balances.items() if v > 0}
+            # Filter active holders (positive balances)
+            active_holders = {
+                wallet: data for wallet, data in holder_balances.items() 
+                if data['tokens'] > 0.001  # Filter dust
+            }
             
-            # Sort holders by balance
-            sorted_holders = sorted(active_holders.items(), key=lambda x: x[1], reverse=True)
+            if not active_holders:
+                return {
+                    "total_holders": len(unique_traders),
+                    "top_10_percentage": 0.0,
+                    "whale_count": 0,
+                    "total_volume_sol": round(total_volume_sol, 2),
+                    "largest_holder_percentage": 0.0,
+                    "analysis_timestamp": datetime.utcnow()
+                }
+            
+            # Sort holders by token balance
+            sorted_holders = sorted(
+                active_holders.items(), 
+                key=lambda x: x[1]['tokens'], 
+                reverse=True
+            )
             
             # Calculate distribution stats
             total_holders = len(active_holders)
-            total_supply_traded = sum(active_holders.values())
+            total_circulating = sum(data['tokens'] for data in active_holders.values())
             
             # Top 10 holders percentage
             top_10_holders = sorted_holders[:10]
-            top_10_supply = sum([balance for _, balance in top_10_holders])
-            top_10_percentage = (top_10_supply / total_supply_traded * 100) if total_supply_traded > 0 else 0
+            top_10_tokens = sum(data['tokens'] for _, data in top_10_holders)
+            top_10_percentage = (top_10_tokens / total_circulating * 100) if total_circulating > 0 else 0
             
-            # Whale count (holders with >1% of traded supply)
-            whale_threshold = total_supply_traded * 0.01
-            whale_count = len([balance for _, balance in sorted_holders if balance >= whale_threshold])
+            # Whale count (holders with >1% of circulating supply)
+            whale_threshold = total_circulating * 0.01
+            whale_count = len([
+                data for _, data in sorted_holders 
+                if data['tokens'] >= whale_threshold
+            ])
+            
+            # Largest holder percentage
+            largest_holder_percentage = (
+                sorted_holders[0][1]['tokens'] / total_circulating * 100
+            ) if sorted_holders and total_circulating > 0 else 0
             
             return {
                 "total_holders": total_holders,
                 "top_10_percentage": round(top_10_percentage, 2),
                 "whale_count": whale_count,
-                "total_volume_sol": round(total_volume, 2),
-                "largest_holder_percentage": round((sorted_holders[0][1] / total_supply_traded * 100), 2) if sorted_holders else 0,
+                "total_volume_sol": round(total_volume_sol, 2),
+                "largest_holder_percentage": round(largest_holder_percentage, 2),
+                "unique_traders": len(unique_traders),
                 "analysis_timestamp": datetime.utcnow()
             }
             

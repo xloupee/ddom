@@ -86,25 +86,81 @@ export default function Popup() {
                     </div>
                 ) : quickStats ? (
                     <div className="space-y-4">
+                        {/* Token Info Header */}
+                        {(quickStats.token_name || quickStats.token_symbol) && (
+                            <div className="card p-4 bg-gradient-to-r from-brand-50 to-brand-100 border-brand-200">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-brand-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-sm font-bold">
+                                            {quickStats.token_symbol?.charAt(0) || '?'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-text-dark">
+                                            {quickStats.token_name || 'Unknown Token'}
+                                        </h3>
+                                        <p className="text-sm text-text-medium">
+                                            {quickStats.token_symbol || 'N/A'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Distribution Analytics */}
                         <div className="card p-4">
-                            <h3 className="font-medium text-text-dark mb-3">Distribution Overview</h3>
-                            <div className="space-y-2">
-                                <div className="flex justify-between">
+                            <h3 className="font-medium text-text-dark mb-3 flex items-center gap-2">
+                                <BarChart3 className="w-4 h-4 text-brand-500" />
+                                Holder Distribution
+                            </h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
                                     <span className="text-sm text-text-medium">Total Holders</span>
-                                    <span className="text-sm font-medium text-text-dark">{quickStats.total_holders.toLocaleString()}</span>
+                                    <span className="text-sm font-semibold text-text-dark bg-surface-secondary px-2 py-1 rounded">
+                                        {quickStats.total_holders.toLocaleString()}
+                                    </span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-sm text-text-medium">Top 10 Hold</span>
-                                    <span className="text-sm font-medium text-text-dark">{quickStats.top_10_percentage.toFixed(1)}%</span>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-text-medium">Top 10 Control</span>
+                                    <span className={`text-sm font-semibold px-2 py-1 rounded ${quickStats.top_10_percentage > 80
+                                            ? 'text-red-700 bg-red-100'
+                                            : quickStats.top_10_percentage > 50
+                                                ? 'text-yellow-700 bg-yellow-100'
+                                                : 'text-green-700 bg-green-100'
+                                        }`}>
+                                        {quickStats.top_10_percentage.toFixed(1)}%
+                                    </span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-sm text-text-medium">Whales (>1%)</span>
-                                    <span className="text-sm font-medium text-text-dark">{quickStats.whale_count}</span>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-text-medium">Whale Accounts</span>
+                                    <span className="text-sm font-semibold text-text-dark bg-surface-secondary px-2 py-1 rounded">
+                                        {quickStats.whale_count}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Risk Assessment */}
+                            <div className="mt-4 pt-3 border-t border-border-primary">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-2 h-2 rounded-full ${quickStats.top_10_percentage > 80
+                                            ? 'bg-red-500'
+                                            : quickStats.top_10_percentage > 50
+                                                ? 'bg-yellow-500'
+                                                : 'bg-green-500'
+                                        }`} />
+                                    <span className="text-xs text-text-subtle">
+                                        {quickStats.top_10_percentage > 80
+                                            ? 'High concentration risk'
+                                            : quickStats.top_10_percentage > 50
+                                                ? 'Moderate concentration'
+                                                : 'Well distributed'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
+
                         <button className="w-full btn-primary text-sm">
-                            View Full Analysis
+                            View Detailed Analysis
                         </button>
                     </div>
                 ) : (
@@ -119,29 +175,47 @@ export default function Popup() {
 
             {/* Quick Stats Preview */}
             <div className="bg-surface-primary border-t border-border-primary p-3">
-                <div className="grid grid-cols-3 gap-3 text-center">
-                    <div>
-                        <Users className="w-4 h-4 mx-auto text-text-subtle mb-1" />
-                        <p className="text-xs text-text-medium">Holders</p>
-                        <p className="text-sm font-medium text-text-dark">
-                            {quickStats ? quickStats.total_holders.toLocaleString() : '-'}
-                        </p>
+                {quickStats ? (
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-brand-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                    {quickStats.token_symbol?.charAt(0) || '?'}
+                                </span>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-text-dark">
+                                    {quickStats.token_symbol || 'Unknown'}
+                                </p>
+                                <p className="text-xs text-text-subtle">
+                                    {quickStats.total_holders.toLocaleString()} holders
+                                </p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-xs text-text-medium">Risk Level</p>
+                            <div className="flex items-center gap-1">
+                                <div className={`w-2 h-2 rounded-full ${quickStats.top_10_percentage > 80
+                                        ? 'bg-red-500'
+                                        : quickStats.top_10_percentage > 50
+                                            ? 'bg-yellow-500'
+                                            : 'bg-green-500'
+                                    }`} />
+                                <span className="text-xs font-medium text-text-dark">
+                                    {quickStats.top_10_percentage > 80
+                                        ? 'High'
+                                        : quickStats.top_10_percentage > 50
+                                            ? 'Medium'
+                                            : 'Low'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <TrendingUp className="w-4 h-4 mx-auto text-text-subtle mb-1" />
-                        <p className="text-xs text-text-medium">Top 10%</p>
-                        <p className="text-sm font-medium text-text-dark">
-                            {quickStats ? `${quickStats.top_10_percentage.toFixed(1)}%` : '-'}
-                        </p>
+                ) : (
+                    <div className="text-center">
+                        <p className="text-xs text-text-subtle">Enter a token address to analyze</p>
                     </div>
-                    <div>
-                        <BarChart3 className="w-4 h-4 mx-auto text-text-subtle mb-1" />
-                        <p className="text-xs text-text-medium">Whales</p>
-                        <p className="text-sm font-medium text-text-dark">
-                            {quickStats ? quickStats.whale_count : '-'}
-                        </p>
-                    </div>
-                </div>
+                )}
             </div>
         </div>
     )

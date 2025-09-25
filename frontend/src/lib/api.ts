@@ -36,6 +36,8 @@ export interface QuickStatsResponse {
     total_holders: number
     top_10_percentage: number
     whale_count: number
+    token_name?: string
+    token_symbol?: string
     last_updated: string
 }
 
