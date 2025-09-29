@@ -191,6 +191,49 @@ export default function Popup() {
                             </div>
                         </div>
 
+                        {/* Early Buyers Section */}
+                        {quickStats.early_buyers && quickStats.early_buyers.length > 0 && (
+                            <div className="card p-4">
+                                <h3 className="font-medium text-text-dark mb-3 flex items-center gap-2">
+                                    <Users className="w-4 h-4 text-brand-500" />
+                                    Early Buyers
+                                </h3>
+                                <div className="space-y-2">
+                                    {quickStats.early_buyers.slice(0, 5).map((buyer, index) => (
+                                        <div key={buyer.wallet_address} className="flex items-center justify-between p-2 bg-surface-secondary rounded">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-brand-500 rounded-full flex items-center justify-center">
+                                                    <span className="text-white text-xs font-bold">
+                                                        {buyer.rank}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-medium text-text-dark">
+                                                        {buyer.wallet_address.slice(0, 6)}...{buyer.wallet_address.slice(-4)}
+                                                    </p>
+                                                    {buyer.purchase_time && (
+                                                        <p className="text-xs text-text-subtle">
+                                                            {new Date(buyer.purchase_time).toLocaleDateString()}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xs font-medium text-text-dark">
+                                                    {buyer.purchase_amount.toLocaleString()}
+                                                </p>
+                                                {buyer.sol_spent && (
+                                                    <p className="text-xs text-text-subtle">
+                                                        {buyer.sol_spent.toFixed(2)} SOL
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <button className="w-full btn-primary text-sm">
                             View Detailed Analysis
                         </button>

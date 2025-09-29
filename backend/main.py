@@ -71,10 +71,13 @@ async def analyze_token(request: TokenAnalysisRequest):
 @app.get("/api/token/{mint_address}/quick-stats")
 async def get_quick_stats(mint_address: str):
     """
-    Get quick statistics for a token (for popup preview) - now with accurate data!
+    Get quick statistics for a token (for popup preview) - now with accurate data and early buyers!
     """
     try:
         print(f"Getting quick stats for: {mint_address}")
+        
+        # Get early buyers from Helius (more comprehensive transaction data)
+        early_buyers = await helius_service.get_early_buyers(mint_address, limit=5)
         
         # Try Helius first for most accurate data
         helius_stats = await helius_service.analyze_token_distribution(mint_address)
@@ -87,7 +90,8 @@ async def get_quick_stats(mint_address: str):
                 "whale_count": helius_stats["whale_count"],
                 "token_name": helius_stats.get("token_name", "Unknown Token"),
                 "token_symbol": helius_stats.get("token_symbol", "UNK"),
-                "last_updated": helius_stats["analysis_timestamp"]
+                "last_updated": helius_stats["analysis_timestamp"],
+                "early_buyers": early_buyers
             }
         
         # Fallback to PumpPortal for pump.fun tokens
@@ -102,12 +106,14 @@ async def get_quick_stats(mint_address: str):
                     "whale_count": pumpportal_stats["whale_count"],
                     "token_name": "PumpFun Token",
                     "token_symbol": "PUMP",
-                    "last_updated": pumpportal_stats["analysis_timestamp"]
+                    "last_updated": pumpportal_stats["analysis_timestamp"],
+                    "early_buyers": early_buyers
                 }
         
         # Final fallback to Solana RPC
         print("All services failed, using basic Solana RPC")
         stats = await solana_service.get_quick_token_stats(mint_address)
+        stats["early_buyers"] = early_buyers
         return stats
         
     except Exception as e:

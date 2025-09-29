@@ -135,6 +135,42 @@ class PumpPortalService:
             logger.error(f"Error fetching trades: {e}")
             return []
     
+    async def get_early_buyers(self, mint_address: str, limit: int = 10) -> List[Dict]:
+        """
+        Get the first few buyers of a token based on trade history
+        """
+        try:
+            # Get historical trades sorted by timestamp
+            trades = await self.get_token_trades(mint_address, limit=5000)
+            
+            if not trades:
+                return []
+            
+            # Filter only buy trades and sort by timestamp
+            buy_trades = [trade for trade in trades if trade.is_buy]
+            buy_trades.sort(key=lambda x: x.timestamp)
+            
+            # Get unique early buyers (first time they bought)
+            early_buyers = []
+            seen_wallets = set()
+            
+            for trade in buy_trades:
+                if trade.trader not in seen_wallets and len(early_buyers) < limit:
+                    early_buyers.append({
+                        "wallet_address": trade.trader,
+                        "purchase_amount": trade.amount,
+                        "purchase_time": trade.timestamp,
+                        "sol_spent": trade.price,
+                        "rank": len(early_buyers) + 1
+                    })
+                    seen_wallets.add(trade.trader)
+            
+            return early_buyers
+            
+        except Exception as e:
+            logger.error(f"Error fetching early buyers: {e}")
+            return []
+
     async def get_token_holders_analysis(self, mint_address: str) -> Dict:
         """
         Analyze token holders using PumpPortal real-time trade data

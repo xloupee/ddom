@@ -30,8 +30,19 @@ class TokenAnalysisResponse(BaseModel):
     top_holders: List[TokenHolder]
     analysis_timestamp: datetime
     
+class EarlyBuyer(BaseModel):
+    wallet_address: str
+    purchase_amount: float
+    purchase_time: Optional[datetime] = None
+    current_balance: Optional[float] = None
+    profit_loss: Optional[float] = None
+    rank: int
+
 class QuickStatsResponse(BaseModel):
     total_holders: int
     top_10_percentage: float
     whale_count: int
     last_updated: datetime
+    token_name: Optional[str] = None
+    token_symbol: Optional[str] = None
+    early_buyers: List[EarlyBuyer] = []

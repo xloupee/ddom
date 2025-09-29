@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Icon Generator</title>
+</head>
+
+<body>
+    <h2>ddom Extension Icon Generator</h2>
+    <p>Use this to generate PNG icons from the SVG. Right-click and save each canvas as PNG.</p>
+
+    <div>
+        <h3>16x16</h3>
+        <canvas id="icon16" width="16" height="16" style="border: 1px solid #ccc; image-rendering: pixelated;"></canvas>
+    </div>
+
+    <div>
+        <h3>32x32</h3>
+        <canvas id="icon32" width="32" height="32" style="border: 1px solid #ccc;"></canvas>
+    </div>
+
+    <div>
+        <h3>48x48</h3>
+        <canvas id="icon48" width="48" height="48" style="border: 1px solid #ccc;"></canvas>
+    </div>
+
+    <div>
+        <h3>128x128</h3>
+        <canvas id="icon128" width="128" height="128" style="border: 1px solid #ccc;"></canvas>
+    </div>
+
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = '#D4A37F';
+            ctx.fillRect(0, 0, size, size);
+
+            // White container
+            const padding = size * 0.15;
+            const containerHeight = size * 0.5;
+            const containerY = size * 0.25;
+
+            ctx.fillStyle = 'white';
+            ctx.fillRect(padding, containerY, size - 2 * padding, containerHeight);
+
+            // Bars
+            const barWidth = size * 0.04;
+            const barSpacing = size * 0.08;
+            const startX = padding + size * 0.05;
+            const barBottomY = containerY + containerHeight - size * 0.05;
+
+            ctx.fillStyle = '#D4A37F';
+
+            // Bar heights (relative to container)
+            const heights = [0.8, 0.5, 0.7, 0.8, 0.4];
+
+            for (let i = 0; i < 5; i++) {
+                const x = startX + i * barSpacing;
+                const height = containerHeight * 0.7 * heights[i];
+                const y = barBottomY - height;
+
+                ctx.fillRect(x, y, barWidth, height);
+            }
+        }
+
+        // Generate all icon sizes
+        drawIcon(document.getElementById('icon16'), 16);
+        drawIcon(document.getElementById('icon32'), 32);
+        drawIcon(document.getElementById('icon48'), 48);
+        drawIcon(document.getElementById('icon128'), 128);
+
+        // Add download functionality
+        document.querySelectorAll('canvas').forEach(canvas => {
+            canvas.addEventListener('click', function () {
+                const link = document.createElement('a');
+                link.download = `icon-${canvas.width}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        });
+    </script>
+</body>
+
+</html>

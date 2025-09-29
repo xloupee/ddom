@@ -1,0 +1,10 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#D4A37F"/>
+  <path d="M32 48C32 42.4772 36.4772 38 42 38H86C91.5228 38 96 42.4772 96 48V80C96 85.5228 91.5228 90 86 90H42C36.4772 90 32 85.5228 32 80V48Z" fill="white"/>
+  <rect x="40" y="46" width="8" height="36" fill="#D4A37F"/>
+  <rect x="52" y="58" width="8" height="24" fill="#D4A37F"/>
+  <rect x="64" y="52" width="8" height="30" fill="#D4A37F"/>
+  <rect x="76" y="46" width="8" height="36" fill="#D4A37F"/>
+  <rect x="88" y="62" width="8" height="20" fill="#D4A37F"/>
+  <text x="64" y="106" text-anchor="middle" fill="#2C1810" font-family="Inter, sans-serif" font-weight="bold" font-size="12">ddom</text>
+</svg>

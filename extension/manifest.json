@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "ddom - Solana Token Analytics",
+    "version": "1.0.0",
+    "description": "Analyze Solana token distribution and holder concentration",
+    "permissions": [
+        "activeTab",
+        "storage"
+    ],
+    "host_permissions": [
+        "http://localhost:8000/*",
+        "https://api.helius.xyz/*",
+        "https://api.pump.fun/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "ddom Analytics"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    }
+}

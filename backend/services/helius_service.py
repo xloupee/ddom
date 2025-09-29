@@ -276,6 +276,118 @@ class HeliusService:
                 "analysis_timestamp": datetime.utcnow()
             }
     
+    async def get_early_buyers(self, mint_address: str, limit: int = 10) -> List[Dict]:
+        """
+        Get early buyers using Helius transaction history
+        """
+        try:
+            # Get recent transactions for the token
+            payload = {
+                "jsonrpc": "2.0",
+                "id": "ddom-request",
+                "method": "getSignaturesForAddress",
+                "params": {
+                    "address": mint_address,
+                    "limit": 1000,
+                    "commitment": "confirmed"
+                }
+            }
+            
+            response = await self.client.post(
+                self.rpc_url,
+                json=payload,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                print(f"Error fetching signatures: {response.status_code}")
+                return []
+            
+            data = response.json()
+            signatures = data.get("result", [])
+            
+            if not signatures:
+                print("No signatures found for token")
+                return []
+            
+            # Get detailed transaction data for the earliest signatures
+            early_buyers = []
+            seen_wallets = set()
+            
+            # Process signatures in chronological order (oldest first)
+            for sig_info in signatures[:50]:  # Check first 50 transactions
+                try:
+                    # Get transaction details
+                    tx_payload = {
+                        "jsonrpc": "2.0",
+                        "id": "ddom-request",
+                        "method": "getTransaction",
+                        "params": {
+                            "signature": sig_info["signature"],
+                            "encoding": "jsonParsed",
+                            "maxSupportedTransactionVersion": 0
+                        }
+                    }
+                    
+                    tx_response = await self.client.post(
+                        self.rpc_url,
+                        json=tx_payload,
+                        headers={"Content-Type": "application/json"}
+                    )
+                    
+                    if tx_response.status_code != 200:
+                        continue
+                    
+                    tx_data = tx_response.json()
+                    transaction = tx_data.get("result")
+                    
+                    if not transaction or not transaction.get("meta", {}).get("err") is None:
+                        continue  # Skip failed transactions
+                    
+                    # Look for token transfers in this transaction
+                    account_keys = transaction.get("transaction", {}).get("message", {}).get("accountKeys", [])
+                    instructions = transaction.get("transaction", {}).get("message", {}).get("instructions", [])
+                    
+                    # Alternative approach: look for token program interactions
+                    for instruction in instructions:
+                        program_id_index = instruction.get("programIdIndex")
+                        if program_id_index is not None and program_id_index < len(account_keys):
+                            program_id = account_keys[program_id_index]
+                            
+                            # Check if this is a token program instruction
+                            if program_id == "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA":
+                                accounts = instruction.get("accounts", [])
+                                if len(accounts) >= 2:
+                                    # Get the signer (likely the buyer)
+                                    signer_index = accounts[0]
+                                    if signer_index < len(account_keys):
+                                        buyer_address = account_keys[signer_index]
+                                        
+                                        if buyer_address not in seen_wallets and len(early_buyers) < limit:
+                                            # Get transaction timestamp
+                                            block_time = sig_info.get("blockTime")
+                                            purchase_time = datetime.fromtimestamp(block_time) if block_time else None
+                                            
+                                            early_buyers.append({
+                                                "wallet_address": buyer_address,
+                                                "purchase_amount": 0,  # Would need more parsing to get exact amount
+                                                "purchase_time": purchase_time.isoformat() if purchase_time else None,
+                                                "sol_spent": 0,  # Would need more parsing
+                                                "rank": len(early_buyers) + 1
+                                            })
+                                            seen_wallets.add(buyer_address)
+                
+                except Exception as e:
+                    print(f"Error processing transaction {sig_info.get('signature', 'unknown')}: {e}")
+                    continue
+            
+            print(f"Found {len(early_buyers)} early buyers for {mint_address}")
+            return early_buyers
+            
+        except Exception as e:
+            print(f"Error fetching early buyers from Helius: {e}")
+            return []
+
     async def close(self):
         await self.client.aclose()
 

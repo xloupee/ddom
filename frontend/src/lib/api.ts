@@ -32,6 +32,14 @@ export interface TokenAnalysisResponse {
     analysis_timestamp: string
 }
 
+export interface EarlyBuyer {
+    wallet_address: string
+    purchase_amount: number
+    purchase_time?: string
+    sol_spent?: number
+    rank: number
+}
+
 export interface QuickStatsResponse {
     total_holders: number
     top_10_percentage: number
@@ -39,6 +47,7 @@ export interface QuickStatsResponse {
     token_name?: string
     token_symbol?: string
     last_updated: string
+    early_buyers?: EarlyBuyer[]
 }
 
 class ApiClient {
