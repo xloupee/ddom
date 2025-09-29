@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ddom - Solana Token Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app" class="w-96 h-[500px] bg-surface-background flex flex-col">
+        <!-- Loading state -->
+        <div id="loading" class="flex items-center justify-center h-full">
+            <div class="text-center">
+                <div
+                    class="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin mx-auto mb-3">
+                </div>
+                <p class="text-sm text-text-medium">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Main app content will be injected here -->
+        <div id="popup-content" class="hidden">
+            <!-- Header -->
+            <div class="bg-surface-primary border-b border-border-primary p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                        <h1 class="font-semibold text-text-dark">ddom</h1>
+                    </div>
+                    <button id="theme-toggle"
+                        class="p-2 rounded-lg hover:bg-surface-secondary transition-colors text-text-medium hover:text-text-dark"
+                        title="Toggle theme">
+                        <svg id="sun-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <svg id="moon-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-sm text-text-medium mt-1">Solana Token Analytics</p>
+            </div>
+
+            <!-- Input Section -->
+            <div class="p-4 bg-surface-primary">
+                <label for="token-address" class="block text-sm font-medium text-text-dark mb-2">
+                    Token Mint Address
+                </label>
+                <div class="flex gap-2">
+                    <input id="token-address" type="text" placeholder="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                        class="input-primary flex-1 text-sm" />
+                    <button id="analyze-btn"
+                        class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Area -->
+            <div id="results-area" class="flex-1 p-4 overflow-y-auto">
+                <div id="empty-state" class="flex flex-col items-center justify-center h-full text-text-subtle">
+                    <svg class="w-12 h-12 mb-3 text-text-subtle opacity-50" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    <p class="text-sm text-center">
+                        Enter a Solana token address to analyze its holder distribution
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Stats Preview -->
+            <div id="quick-stats" class="bg-surface-primary border-t border-border-primary p-3">
+                <div class="text-center">
+                    <p class="text-xs text-text-subtle">Enter a token address to analyze</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Anthropic Color Palette */
+    --primary-orange: #d4a37f;
+    --orange-light: #d8ac8c;
+    --orange-medium: #ddb599;
+    --orange-warm: #e1bfa5;
+    --beige-light: #e5c8b2;
+    --beige-medium: #ead1bf;
+    --beige-soft: #eedacc;
+    --beige-pale: #f2e3d9;
+    --beige-ultra-light: #f6ede5;
+    --beige-whisper: #fbf6f2;
+
+    /* Light Mode Colors */
+    --text-dark: #2c1810;
+    --text-medium: #5d4037;
+    --text-light: #8d6e63;
+    --text-subtle: #a1887f;
+
+    --background-primary: #fbf6f2;
+    --background-secondary: #f6ede5;
+    --surface-primary: #ffffff;
+    --surface-secondary: #eedacc;
+    --border-color: #e5c8b2;
+    --accent-primary: #d4a37f;
+    --accent-hover: #c89968;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Colors */
+    --text-dark: #f5f1eb;
+    --text-medium: #d4c5b5;
+    --text-light: #b39c8a;
+    --text-subtle: #9b8775;
+
+    --background-primary: #0d0a07;
+    --background-secondary: #1a140f;
+    --surface-primary: #1f1812;
+    --surface-secondary: #2a2017;
+    --border-color: #3d2f24;
+    --accent-primary: #d4a37f;
+    --accent-hover: #e2b389;
+
+    /* Dark specific overrides */
+    --beige-ultra-light: #2a2017;
+    --beige-whisper: #1f1812;
+}
+
+@layer base {
+    html {
+        font-family: 'Inter', system-ui, sans-serif;
+        background-color: var(--background-primary);
+        color: var(--text-dark);
+    }
+
+    body {
+        background-color: var(--background-primary);
+        color: var(--text-dark);
+    }
+}
+
+@layer components {
+    .card {
+        @apply bg-white border rounded-lg shadow-sm;
+        border-color: var(--border-color);
+        box-shadow: 0 1px 3px rgba(212, 163, 127, 0.1), 0 1px 2px rgba(212, 163, 127, 0.06);
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 6px rgba(212, 163, 127, 0.15), 0 2px 4px rgba(212, 163, 127, 0.08);
+    }
+
+    .btn-primary {
+        background-color: var(--accent-primary);
+        color: white;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        border: none;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 1px 2px rgba(212, 163, 127, 0.2);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--accent-hover);
+        box-shadow: 0 2px 4px rgba(212, 163, 127, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+        background-color: var(--text-subtle);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-secondary {
+        background-color: var(--surface-secondary);
+        color: var(--text-medium);
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--beige-medium);
+        border-color: var(--accent-primary);
+        color: var(--text-dark);
+    }
+
+    /* Input Styles */
+    .input-primary {
+        background-color: var(--surface-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        color: var(--text-dark);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .input-primary:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(212, 163, 127, 0.1);
+    }
+
+    .input-primary::placeholder {
+        color: var(--text-subtle);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--beige-ultra-light);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--accent-primary);
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-hover);
+    }
+}
