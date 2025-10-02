@@ -127,14 +127,14 @@ async function handleClipboardSearch() {
     try {
         // Read clipboard content
         const clipboardText = await navigator.clipboard.readText();
-        
+
         if (!clipboardText) {
             showClipboardError('Clipboard is empty');
             return;
         }
 
         const tokenAddress = clipboardText.trim();
-        
+
         if (!isValidSolanaAddress(tokenAddress)) {
             showClipboardError('Clipboard does not contain a valid Solana address');
             return;
@@ -142,14 +142,14 @@ async function handleClipboardSearch() {
 
         // Show notification that we found a token
         showClipboardNotification(tokenAddress);
-        
+
         // Auto-fill the input
         tokenAddressInput.value = tokenAddress;
         analyzeBtn.disabled = false;
-        
+
         // Auto-analyze the token
         handleAnalyze();
-        
+
     } catch (error) {
         console.error('Clipboard access failed:', error);
         showClipboardError('Could not access clipboard. Please check permissions.');
@@ -430,9 +430,9 @@ function showClipboardNotification(tokenAddress) {
             <span>Found token in clipboard: ${tokenAddress.slice(0, 6)}...${tokenAddress.slice(-4)}</span>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remove notification after 3 seconds
     setTimeout(() => {
         if (notification.parentNode) {
@@ -455,9 +455,9 @@ function showClipboardError(message) {
             <span>${message}</span>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remove notification after 4 seconds (longer for errors)
     setTimeout(() => {
         if (notification.parentNode) {
