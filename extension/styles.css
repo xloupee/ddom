@@ -261,6 +261,33 @@ body {
     box-shadow: none;
 }
 
+.btn-secondary {
+    background-color: var(--surface-secondary);
+    color: var(--text-dark);
+    border: 1px solid var(--border-primary);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--border-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:disabled {
+    background-color: var(--text-subtle);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .input-primary {
     background-color: var(--surface-primary);
     border: 1px solid var(--border-color);
@@ -360,6 +387,34 @@ body {
 
 .risk-high {
     background-color: #ef4444;
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    background-color: var(--brand-500);
+    color: white;
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .stat-badge {

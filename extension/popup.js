@@ -4,6 +4,7 @@ const API_BASE_URL = 'http://localhost:8000';
 // DOM Elements
 let tokenAddressInput;
 let analyzeBtn;
+let clipboardBtn;
 let resultsArea;
 let quickStats;
 let themeToggle;
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeElements();
     initializeTheme();
     initializeEventListeners();
+    checkClipboardForToken();
 
     // Show the popup content and hide loading
     loading.classList.add('hidden');
@@ -32,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function initializeElements() {
     tokenAddressInput = document.getElementById('token-address');
     analyzeBtn = document.getElementById('analyze-btn');
+    clipboardBtn = document.getElementById('clipboard-btn');
     resultsArea = document.getElementById('results-area');
     quickStats = document.getElementById('quick-stats');
     themeToggle = document.getElementById('theme-toggle');
@@ -59,6 +62,9 @@ function initializeEventListeners() {
 
     // Analyze button
     analyzeBtn.addEventListener('click', handleAnalyze);
+
+    // Clipboard button
+    clipboardBtn.addEventListener('click', handleClipboardSearch);
 
     // Enter key in input
     tokenAddressInput.addEventListener('keypress', function (e) {
@@ -112,6 +118,41 @@ async function handleAnalyze() {
         displayError(error.message || 'Analysis failed. Please try again.');
     } finally {
         setAnalyzing(false);
+    }
+}
+
+async function handleClipboardSearch() {
+    if (isAnalyzing) return;
+
+    try {
+        // Read clipboard content
+        const clipboardText = await navigator.clipboard.readText();
+
+        if (!clipboardText) {
+            showClipboardError('Clipboard is empty');
+            return;
+        }
+
+        const tokenAddress = clipboardText.trim();
+
+        if (!isValidSolanaAddress(tokenAddress)) {
+            showClipboardError('Clipboard does not contain a valid Solana address');
+            return;
+        }
+
+        // Show notification that we found a token
+        showClipboardNotification(tokenAddress);
+
+        // Auto-fill the input
+        tokenAddressInput.value = tokenAddress;
+        analyzeBtn.disabled = false;
+
+        // Auto-analyze the token
+        handleAnalyze();
+
+    } catch (error) {
+        console.error('Clipboard access failed:', error);
+        showClipboardError('Could not access clipboard. Please check permissions.');
     }
 }
 
@@ -342,4 +383,85 @@ function getRiskClass(percentage) {
 function openDetailedView() {
     // Open the web app in a new tab for detailed analysis
     chrome.tabs.create({ url: 'http://localhost:3000/popup' });
+}
+
+// Check clipboard for valid Solana token address
+async function checkClipboardForToken() {
+    try {
+        // Read clipboard content
+        const clipboardText = await navigator.clipboard.readText();
+
+        if (clipboardText && isValidSolanaAddress(clipboardText.trim())) {
+            const tokenAddress = clipboardText.trim();
+
+            // Show a notification that we found a token
+            showClipboardNotification(tokenAddress);
+
+            // Auto-fill the input
+            tokenAddressInput.value = tokenAddress;
+            analyzeBtn.disabled = false;
+
+            // Auto-analyze the token
+            handleAnalyze();
+        }
+    } catch (error) {
+        // Clipboard access might be denied or not available
+        console.log('Could not access clipboard:', error);
+    }
+}
+
+// Validate if string is a valid Solana address
+function isValidSolanaAddress(address) {
+    // Solana addresses are base58 encoded and typically 32-44 characters
+    const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    return base58Regex.test(address);
+}
+
+// Show notification when token is found in clipboard
+function showClipboardNotification(tokenAddress) {
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Found token in clipboard: ${tokenAddress.slice(0, 6)}...${tokenAddress.slice(-4)}</span>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+// Show error notification for clipboard issues
+function showClipboardError(message) {
+    // Create a temporary error notification
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.style.backgroundColor = '#ef4444'; // Red background for errors
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <span>${message}</span>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Remove notification after 4 seconds (longer for errors)
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 4000);
 }

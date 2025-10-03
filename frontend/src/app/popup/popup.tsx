@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, BarChart3, Users, TrendingUp, AlertCircle, Sun, Moon } from 'lucide-react'
+import { Search, BarChart3, Users, TrendingUp, AlertCircle, Sun, Moon, Clipboard } from 'lucide-react'
 import { apiClient, QuickStatsResponse } from '@/lib/api'
 
 export default function Popup() {
@@ -10,6 +10,7 @@ export default function Popup() {
     const [quickStats, setQuickStats] = useState<QuickStatsResponse | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isDarkMode, setIsDarkMode] = useState(false)
+    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null)
 
     // Dark mode toggle logic
     useEffect(() => {
@@ -19,6 +20,37 @@ export default function Popup() {
 
         setIsDarkMode(shouldUseDark)
         document.documentElement.setAttribute('data-theme', shouldUseDark ? 'dark' : 'light')
+    }, [])
+
+    // Auto-detect clipboard on page load
+    useEffect(() => {
+        const checkClipboard = async () => {
+            try {
+                const clipboardText = await navigator.clipboard.readText()
+
+                if (clipboardText && isValidSolanaAddress(clipboardText.trim())) {
+                    const address = clipboardText.trim()
+                    showNotification('success', `Found token in clipboard: ${address.slice(0, 6)}...${address.slice(-4)}`)
+                    setTokenAddress(address)
+                    // Auto-analyze after a short delay
+                    setTimeout(() => {
+                        if (address.trim()) {
+                            setIsAnalyzing(true)
+                            setError(null)
+                            apiClient.getQuickStats(address.trim())
+                                .then(stats => setQuickStats(stats))
+                                .catch(err => setError(err instanceof Error ? err.message : 'Analysis failed'))
+                                .finally(() => setIsAnalyzing(false))
+                        }
+                    }, 1000)
+                }
+            } catch (error) {
+                // Clipboard access might be denied or not available
+                console.log('Could not access clipboard:', error)
+            }
+        }
+
+        checkClipboard()
     }, [])
 
     const toggleDarkMode = () => {
@@ -46,8 +78,66 @@ export default function Popup() {
         }
     }
 
+    const handleClipboardSearch = async () => {
+        if (isAnalyzing) return
+
+        try {
+            const clipboardText = await navigator.clipboard.readText()
+
+            if (!clipboardText) {
+                showNotification('error', 'Clipboard is empty')
+                return
+            }
+
+            const address = clipboardText.trim()
+
+            if (!isValidSolanaAddress(address)) {
+                showNotification('error', 'Clipboard does not contain a valid Solana address')
+                return
+            }
+
+            showNotification('success', `Found token in clipboard: ${address.slice(0, 6)}...${address.slice(-4)}`)
+            setTokenAddress(address)
+            handleAnalyze()
+
+        } catch (err) {
+            showNotification('error', 'Could not access clipboard. Please check permissions.')
+        }
+    }
+
+    const isValidSolanaAddress = (address: string): boolean => {
+        const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/
+        return base58Regex.test(address)
+    }
+
+    const showNotification = (type: 'success' | 'error', message: string) => {
+        setNotification({ type, message })
+        setTimeout(() => setNotification(null), type === 'error' ? 4000 : 3000)
+    }
+
     return (
-        <div className="w-96 h-[500px] bg-surface-background flex flex-col">
+        <div className="w-96 h-[500px] bg-surface-background flex flex-col relative">
+            {/* Notification */}
+            {notification && (
+                <div className={`fixed top-2 left-2 right-2 z-50 p-3 rounded-lg shadow-lg ${notification.type === 'success'
+                    ? 'bg-brand-500 text-white'
+                    : 'bg-red-500 text-white'
+                    }`}>
+                    <div className="flex items-center gap-2">
+                        {notification.type === 'success' ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        )}
+                        <span className="text-sm">{notification.message}</span>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="bg-surface-primary border-b border-border-primary p-4">
                 <div className="flex items-center justify-between">
@@ -84,6 +174,14 @@ export default function Popup() {
                         placeholder="3L8MNSHc3V7ssEdQiHRbGrJfMPaSJMKykhBHKgikpump"
                         className="input-primary flex-1 text-sm"
                     />
+                    <button
+                        onClick={handleClipboardSearch}
+                        disabled={isAnalyzing}
+                        className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                        title="Search token from clipboard"
+                    >
+                        <Clipboard className="w-4 h-4" />
+                    </button>
                     <button
                         onClick={handleAnalyze}
                         disabled={!tokenAddress.trim() || isAnalyzing}
