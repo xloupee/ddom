@@ -381,8 +381,13 @@ function getRiskClass(percentage) {
 }
 
 function openDetailedView() {
-    // Open the web app in a new tab for detailed analysis
-    chrome.tabs.create({ url: 'http://localhost:3000/popup' });
+    // Open the detailed analysis page in a new tab
+    const tokenAddress = tokenAddressInput.value.trim();
+    if (tokenAddress) {
+        chrome.tabs.create({ url: `http://localhost:3000/analysis/${tokenAddress}` });
+    } else {
+        chrome.tabs.create({ url: 'http://localhost:3000/popup' });
+    }
 }
 
 // Check clipboard for valid Solana token address

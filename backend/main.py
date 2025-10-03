@@ -77,7 +77,7 @@ async def get_quick_stats(mint_address: str):
         print(f"Getting quick stats for: {mint_address}")
         
         # Get early buyers from Helius (more comprehensive transaction data)
-        early_buyers = await helius_service.get_early_buyers(mint_address, limit=5)
+        early_buyers = await helius_service.get_early_buyers(mint_address, limit=10)
         
         # Try Helius first for most accurate data
         helius_stats = await helius_service.analyze_token_distribution(mint_address)

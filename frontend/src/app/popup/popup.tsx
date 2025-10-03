@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Search, BarChart3, Users, TrendingUp, AlertCircle, Sun, Moon, Clipboard } from 'lucide-react'
 import { apiClient, QuickStatsResponse } from '@/lib/api'
 
 export default function Popup() {
+    const router = useRouter()
     const [tokenAddress, setTokenAddress] = useState('')
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [quickStats, setQuickStats] = useState<QuickStatsResponse | null>(null)
@@ -332,7 +334,10 @@ export default function Popup() {
                             </div>
                         )}
 
-                        <button className="w-full btn-primary text-sm">
+                        <button
+                            onClick={() => router.push(`/analysis/${tokenAddress}`)}
+                            className="w-full btn-primary text-sm"
+                        >
                             View Detailed Analysis
                         </button>
                     </div>

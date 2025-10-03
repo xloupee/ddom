@@ -1,0 +1,4 @@
+{
+  "/analysis/[mintAddress]/page": "app/analysis/[mintAddress]/page.js",
+  "/popup/page": "app/popup/page.js"
+}
